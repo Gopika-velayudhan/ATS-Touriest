@@ -5,12 +5,12 @@ const ActivitySchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
-      trim: true,
+      
     },
     description: {
       type: String,
       required: true,
-      trim: true,
+      
     },
     duration: {
       type: String, 
@@ -19,11 +19,22 @@ const ActivitySchema = new mongoose.Schema(
     price: {
       type: Number,
       required: true,
-      min: 0,
+      
     },
+
+    images: [{
+        type: String
+    }],
+    
     date: {
       type: Date, 
       required: true,
+    },
+
+    reviews: [{ type: mongoose.Schema.ObjectId, ref: "Review" }],
+    overallRating: {
+      type: Number,
+      default: 0,
     },
   },
   {

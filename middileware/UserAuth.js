@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
 
-const VerifyToken = (req, res, next) => {
+const VerifyUserToken = (req, res, next) => {
   const authHeader = req.headers["authorization"];
 
   if (!authHeader || !authHeader.startsWith("Bearer")) {
@@ -14,11 +14,12 @@ const VerifyToken = (req, res, next) => {
   jwt.verify(token, process.env.USER_ACCESS_TOKEN_SECRET, (err, decoded) => {
     if (err) {
       console.log(err);
-      return res.status(401).json({ error: "unauthorised." });
+      return res.status(401).json({ error: "unauthorized." });
     }
-    req.email = decoded.email;
+    
+    req.user = { userId: decoded.id, email: decoded.email };
     next();
   });
 };
 
-export default VerifyToken;
+export default VerifyUserToken;

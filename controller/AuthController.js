@@ -9,6 +9,8 @@ dotenv.config();
 
 const otpStore = new Map();
 
+//user register
+
 export const userRegister = async (req, res) => {
   const { value, error } = userValidationSchema.validate(req.body);
   if (error) {
@@ -68,6 +70,8 @@ export const userRegister = async (req, res) => {
   }
 };
 
+//verify otp
+
 export const verifyOTP = async (req, res) => {
   const { email, otp } = req.body;
   const storedOtpData = otpStore.get(email);
@@ -105,6 +109,8 @@ export const verifyOTP = async (req, res) => {
   }
 };
 
+//userlogin
+
 export const userLogin = async (req, res) => {
   const { value, error } = userValidationSchema.validate(req.body);
 
@@ -136,7 +142,8 @@ export const userLogin = async (req, res) => {
     }
     const token = jwt.sign(
       { id: validUser._id },
-      process.env.USER_ACCESS_TOKEN_SECRET
+      process.env.USER_ACCESS_TOKEN_SECRET,
+      { expiresIn: '30d' }
     );
     res.status(200).json({
       statusCode: 200,
@@ -151,6 +158,9 @@ export const userLogin = async (req, res) => {
       .json({ statusCode: 500, message: "internal server error", data: null });
   }
 };
+
+//forgotpassword
+
 export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -192,6 +202,9 @@ export const forgotPassword = async (req, res) => {
     });
   }
 };
+
+//resetpassword
+
 export const resetPassword = async (req, res) => {
   const { token } = req.params;
   const { newPassword } = req.body;
@@ -236,6 +249,8 @@ export const resetPassword = async (req, res) => {
   }
 };
 
+//getUserData
+
 export const getUserData = async (req, res) => {
     const { id } = req.params;
   
@@ -256,12 +271,49 @@ export const getUserData = async (req, res) => {
     }
   };
 
-  export const updateUser = async (req, res) => {
-    const { id } = req.params;
-    const { name, email, address,phoneNumber } = req.body;
+  //create profile
+
+  export const createProfile = async (req, res) => {
+    const { userId } = req.params;
+    const { value, error } = userValidationSchema.validate(req.body);
   
     try {
-      const updatedData = { name, email, address,phoneNumber };
+      if (error) {
+        return res.status(400).json({
+          statusCode:400,
+          message:"validation error",
+          data:null
+        })
+      }
+  
+      const user = await User.findById(userId);
+      if (!user) {
+          return res.status(404).json({
+            statusCode:404,
+            message:"user not found",
+            data:null
+          })
+      }
+  
+      user.profile = value;
+      await user.save();
+  
+      res.status(200).json({ statusCode:200,message: "Profile updated successfully",data: user });
+    } catch (err) {
+      return res
+      .status(500)
+      .json({ statusCode: 500, message: "internal server error",data:null });
+    }
+  };
+
+  //updateuserdata
+
+  export const updateUser = async (req, res) => {
+    const { id } = req.params;
+    const { name, email, address,phoneNumber, image} = req.body;
+  
+    try {
+      const updatedData = { name, email, address,phoneNumber,image };
   
      
   

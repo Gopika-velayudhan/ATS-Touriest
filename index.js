@@ -5,6 +5,9 @@ import dotenv from "dotenv";
 import cors from "cors";
 import Userrouter from "./route/userRoutes.js";
 import PackageRouter from "./route/packageRoutes.js";
+import Activerouter from "./route/activeRoutes.js";
+import ReviewRouter from "./route/reviewRoute.js";
+import AdminRoute from "./route/adminRoute.js";
 
 dotenv.config();
 
@@ -39,8 +42,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //     message,
 //   });
 // });
-app.use("/api/auth",Userrouter)
-app.use("/api",PackageRouter)
+app.use("/api", Activerouter);
+app.use('/api/admin',AdminRoute)
+app.use("/api/auth", Userrouter);
+app.use("/api", PackageRouter);
+
+app.use("/api",ReviewRouter)
+
+
 
 const port = process.env.PORT || 3005;
 

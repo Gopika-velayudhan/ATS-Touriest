@@ -42,6 +42,14 @@ const PackageSchema = new mongoose.Schema(
           
         },
       ],
+
+      includedHotels: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'HotelFacility', 
+          
+        },
+      ],
     availableSeats: {
       type: Number,
       required: true,
@@ -51,7 +59,14 @@ const PackageSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+
+    reviews: [{ type: mongoose.Schema.ObjectId, ref: "Review" }],
+    overallRating: {
+      type: Number,
+      default: 0,
+    },
   },
+  
   {
     timestamps: true, 
   }
