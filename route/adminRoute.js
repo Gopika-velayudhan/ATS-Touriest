@@ -1,7 +1,7 @@
 import express from 'express'
 import { adminLogin,allUser,getUserById,blockuser } from '../controller/AdminController.js'
 import { tryCatchMiddleware } from '../middileware/ErrorHandler.js'
-import {getAllBookingDetails,getBookingHistory} from "../controller/BookingController.js"
+import {getAllBookingDetails,getBookingHistory,getTotalTransactionStats} from "../controller/BookingController.js"
 import verifyAdmintoken from '../middileware/AdminAuth.js'
 
 const AdminRoute = express.Router()
@@ -14,6 +14,7 @@ AdminRoute
 .get('/users/:id',tryCatchMiddleware(getUserById))
 .patch("/users/:id", blockuser)
 .get('/bookings',tryCatchMiddleware(getAllBookingDetails))
+.get("/transactions",tryCatchMiddleware(getTotalTransactionStats))
 
 
 

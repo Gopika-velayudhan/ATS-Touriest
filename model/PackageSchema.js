@@ -43,13 +43,7 @@ const PackageSchema = new mongoose.Schema(
         },
       ],
 
-      includedHotels: [
-        {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'HotelFacility', 
-          
-        },
-      ],
+      
     availableSeats: {
       type: Number,
       required: true,

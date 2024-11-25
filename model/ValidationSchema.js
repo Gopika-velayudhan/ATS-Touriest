@@ -70,6 +70,8 @@ export const packageBookingValidationSchema = Joi.object({
 
   packageId: Joi.string().trim().required(),
 
+  activityIds: Joi.array().items(Joi.string()),
+
   bookingDate: Joi.date().optional(),
 
   numberOfSeats: Joi.number().integer().min(1).required(),

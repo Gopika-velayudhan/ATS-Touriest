@@ -86,7 +86,7 @@ export const addReview = async (req, res) => {
       }
 
       
-      const userActivityBooking = await ActivityBooking.findOne({ userId: user, activityId: activity });
+      const userActivityBooking = await PackageBooking.findOne({ userId: user, activityIds: activity });
       if (!userActivityBooking) {
         return res.status(403).json({
           statusCode: 403,

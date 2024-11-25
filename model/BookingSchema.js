@@ -12,6 +12,12 @@ const PackageBookingSchema = new mongoose.Schema(
       ref: "Package", 
       required: true,
     },
+    activityIds: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Activity", 
+      },
+    ],
     bookingDate: {
       type: Date,
       default: Date.now, 
