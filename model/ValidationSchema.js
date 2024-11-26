@@ -64,40 +64,58 @@ export const joiReviewSchema = Joi.object({
   reviewText: Joi.string().min(10).required(),
 });
 
-
 export const packageBookingValidationSchema = Joi.object({
-  userId: Joi.string(),
+  userId: Joi.string().optional(),
 
   packageId: Joi.string().trim().required(),
 
-  activityIds: Joi.array().items(Joi.string()),
+  activityIds: Joi.array().items(Joi.string()).optional(),
 
   bookingDate: Joi.date().optional(),
 
-  numberOfSeats: Joi.number().integer().min(1).required(),
+  checkInTime: Joi.date().required().messages({
+    "any.required": "Check-in time is required.",
+  }),
 
-  totalPrice: Joi.number().min(0).required(),
+  checkOutTime: Joi.date().required().greater(Joi.ref("checkInTime")).messages({
+    "any.required": "Check-out time is required.",
+    "date.greater": "Check-out time must be after check-in time.",
+  }),
+
+  numberOfSeats: Joi.number().integer().min(1).required().messages({
+    "any.required": "Number of seats is required.",
+    "number.min": "Number of seats must be at least 1.",
+  }),
+
+  totalPrice: Joi.number().min(0).required().messages({
+    "any.required": "Total price is required.",
+    "number.min": "Total price must be at least 0.",
+  }),
 
   paymentStatus: Joi.string()
     .valid("pending", "completed", "failed")
     .default("pending"),
-  
 
   paymentMethod: Joi.string()
     .valid("credit_card", "debit_card", "paypal", "razorpay")
-    .required(),
-    
+    .required()
+    .messages({
+      "any.required": "Payment method is required.",
+    }),
 
   status: Joi.string()
     .valid("pending", "confirmed", "cancelled", "completed")
     .default("pending"),
-    
 
   specialRequests: Joi.string().optional(),
 
   cancellationPolicy: Joi.string().optional(),
 
-  cancellationFee: Joi.number().min(0).default(0)
-    
-});
+  cancellationFee: Joi.number().min(0).default(0),
 
+  refundable: Joi.boolean().default(true).optional(),
+
+  bookingReferenceId: Joi.string(),
+
+  additionalServices: Joi.array().items(Joi.string()).optional(),
+});
