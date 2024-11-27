@@ -3,6 +3,8 @@ import Joi from "joi";
 export const userValidationSchema = Joi.object({
   name: Joi.string().required(),
 
+  googleId:Joi.string(),
+
   email: Joi.string().email().required(),
 
   address: Joi.string().required(),

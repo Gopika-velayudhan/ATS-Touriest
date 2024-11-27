@@ -8,6 +8,9 @@ import PackageRouter from "./route/packageRoutes.js";
 import Activerouter from "./route/activeRoutes.js";
 import ReviewRouter from "./route/reviewRoute.js";
 import AdminRoute from "./route/adminRoute.js";
+import passport from "./utility/PassportConfig.js";
+import session from "express-session";
+import googleRouter from "./route/googleroute.js";
 
 dotenv.config();
 
@@ -32,17 +35,20 @@ app.use(
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// app.use((err, req, res, next) => {
-//   console.error("Error:", err);
-//   const statusCode = err.statusCode || 500;
-//   const message = err.message || "Internal server error";
-//   res.status(statusCode).json({
-//     success: false,
-//     statusCode,
-//     message,
-//   });
-// });
+app.use(
+  session({
+    secret: process.env.USER_ACCESS_TOKEN_SECRET,
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+
 app.use("/api", Activerouter);
+app.use("/api",googleRouter)
 app.use('/api/admin',AdminRoute)
 app.use("/api/auth", Userrouter);
 app.use("/api", PackageRouter);
