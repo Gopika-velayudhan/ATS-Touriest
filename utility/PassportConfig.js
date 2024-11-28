@@ -24,7 +24,7 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        const existingUser = await UserModel.findOne({
+        const existingUser = await User.findOne({
           googleId: profile.id,
         }).exec();
 
@@ -32,7 +32,7 @@ passport.use(
           return done(null, { ...existingUser.toObject(), token: accessToken });
         }
 
-        const newUser = new UserModel({
+        const newUser = new User({
           googleId: profile.id,
           name: profile.name?.givenName,
         
