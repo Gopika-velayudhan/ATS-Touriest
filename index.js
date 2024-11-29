@@ -11,6 +11,7 @@ import AdminRoute from "./route/adminRoute.js";
 import passport from "./utility/PassportConfig.js";
 import session from "express-session";
 import googleRouter from "./route/googleroute.js";
+import VisaRouter from "./route/VisaRoute.js";
 
 dotenv.config();
 
@@ -52,7 +53,7 @@ app.use("/api",googleRouter)
 app.use('/api/admin',AdminRoute)
 app.use("/api/auth", Userrouter);
 app.use("/api", PackageRouter);
-
+app.use("/api",VisaRouter)
 app.use("/api",ReviewRouter)
 
 

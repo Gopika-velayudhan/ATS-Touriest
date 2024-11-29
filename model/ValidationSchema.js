@@ -121,3 +121,38 @@ export const packageBookingValidationSchema = Joi.object({
 
   additionalServices: Joi.array().items(Joi.string()).optional(),
 });
+
+
+
+export const visaValidationSchema = Joi.object({
+  country: Joi.string().required(),
+
+  visaType: Joi.string()
+    .valid('Tourist', 'Business', 'Student', 'Work', 'Transit') 
+    .required(),
+
+  visaMode: Joi.string()
+    .valid('E-Visa', 'Visa on Arrival', 'Regular Visa') 
+    .required(),
+
+  validity: Joi.string().required(), 
+
+  maxStay : Joi.string().required(),
+
+  nationality : Joi.string(),
+
+  travelerNumber:Joi.number().min(1),
+
+
+  processingTime: Joi.string().required(), 
+
+  pricePerPerson: Joi.number().min(0).required(),
+
+  requirements: Joi.array().items(Joi.string()),
+
+  additionalInfo: Joi.string().optional(),
+
+  createdAt: Joi.date().optional(), 
+  updatedAt: Joi.date().optional(), 
+});
+

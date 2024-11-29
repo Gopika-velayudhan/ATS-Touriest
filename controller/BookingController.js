@@ -36,7 +36,7 @@ export const createBooking = async (req, res) => {
       });
     }
 
-    // Generate a unique booking reference ID
+    
     const currentDate = new Date();
     const formattedDate = currentDate.toISOString().slice(0, 10).replace(/-/g, ""); 
     const randomString = crypto.randomBytes(3).toString("hex").toUpperCase();
