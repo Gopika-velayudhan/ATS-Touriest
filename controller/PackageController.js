@@ -1,6 +1,6 @@
 import Package from "../model/PackageSchema.js";
 import { packageValidationSchema } from "../model/ValidationSchema.js";
-import mongoose from "mongoose";
+import User from '../model/AuthSchema.js'
 
 //create package
 
@@ -237,3 +237,137 @@ export const searchPackages = async (req, res) => {
     });
   }
 };
+
+export const Wishlist = async (req, res) => {
+  const userid = req.params.id;
+  if (!userid) {
+    return res.status(404).json({
+      statusCode:404,
+      message:"user not found",
+      data:null
+    })
+  }
+
+  try {
+    const { packageid } = req.body;
+    const user = await User.findById(userid);
+    if (!user) {
+      return res.status(404).json({
+        statusCode:404,
+        message:"user not found",
+        data:null
+      })
+    }
+
+    const findpack = await User.findOne({ _id: userid, wishlist: packageid });
+    if (findpack) {
+      return res.status(404).json({
+        statusCode:404,
+        message:"the package already exist in wishlist",
+        data:null
+      })
+    }
+
+    const updatewishlist = await User.updateOne(
+      { _id: userid },
+      { $push: { wishlist: packageid } }
+    );
+    console.log(updatewishlist);
+    
+
+    return res.status(201).send({
+      statusCode: 201,
+      message: "successfully added package in wishlist",
+      data: updatewishlist,
+    });
+  } catch (err) {
+    return res
+    .status(500)
+    .json({ statusCode: 500, message: "internal server error", data: null });
+  }
+};
+
+export const showwishlist = async (req, res) => {
+  const userid = req.params.id;
+  try {
+    const user = await User.findById(userid);
+
+    if (!user) {
+      return res.status(404).json({
+        statusCode:404,
+        message:"user not found",
+        data:null
+      })
+    }
+
+    const wishlistpack = user.wishlist;
+    const allwishCount = wishlistpack.length;
+
+    if (allwishCount === 0) {
+      return res.status(200).json({
+        statusCode: 200,
+        message: "Wishlist is empty",
+        data: [],
+        datacount: allwishCount,
+      });
+    }
+
+    const wishpack = await Package.find({ _id: { $in: wishlistpack } });
+
+    res.status(200).json({
+      statusCode: 200,
+      message: "Wishlist packages fetched successfully",
+      data: wishpack,
+      datacount: allwishCount,
+    });
+  } catch (err) {
+    return res
+    .status(500)
+    .json({ statusCode: 500, message:"internal server error", data: null });
+  }
+};
+
+export const deletewishlist = async (req, res, next) => {
+  const userid = req.params.id;
+  if (!userid) {
+    return res.status(404).json({
+      statusCode:404,
+      message:"user not found",
+      data:null
+    })
+  }
+
+  try {
+    const { packageid } = req.body;
+    if (!packageid) {
+      return res.status(404).json({
+        statusCode:404,
+        message:"package not found",
+        data:null
+      })
+    }
+
+    const user = await User.findById(userid);
+    if (!user) {
+      return res.status(404).json({
+        statusCode:404,
+        message:"user not found",
+        data:null
+      })
+    }
+
+    await User.updateOne({ _id: userid }, { $pull: { wishlist: packageid } });
+
+    return res.status(200).json({
+      statusCode: 200,
+      message: "successfully deleted package",
+      data:null
+    });
+  } catch (err) {
+    return res
+    .status(500)
+    .json({ statusCode: 500, message:"internal server error", data: null });
+  }
+};
+
+

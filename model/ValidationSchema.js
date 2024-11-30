@@ -8,6 +8,7 @@ export const userValidationSchema = Joi.object({
   email: Joi.string().email().required(),
 
   address: Joi.string().required(),
+  wishlist:Joi.string(),
 
   password: Joi.string().min(6).required(),
   isVerified: Joi.boolean().optional().default(false),

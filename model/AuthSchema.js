@@ -23,6 +23,7 @@ const UserSchema = new mongoose.Schema(
     isVerified: { type: Boolean, default: false },
     isActive: { type: Boolean, default: true },
     isBlocked: { type: Boolean, default: false },
+    wishlist: [{ type: mongoose.Schema.ObjectId, ref: "Package" }],
     phoneNumber: {
       type: String,
       required: true,

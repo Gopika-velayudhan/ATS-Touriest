@@ -8,6 +8,9 @@ import {
   updatepackages,
   deletepackage,
   searchPackages,
+  Wishlist,
+  showwishlist,
+  deletewishlist
 } from "../controller/PackageController.js";
 import verifyAdmintoken from "../middileware/AdminAuth.js";
 import verifyUsertoken from "../middileware/UserAuth.js";
@@ -27,6 +30,9 @@ PackageRouter.post(
   .get("/packages/:id",verifyUsertoken, tryCatchMiddleware(SinglePackage))
 
   .put("/packages/:id",verifyAdmintoken, multipleImageUpload, tryCatchMiddleware(updatepackages))
-  .delete("/packages/:id",verifyAdmintoken, tryCatchMiddleware(deletepackage));
+  .delete("/packages/:id",verifyAdmintoken, tryCatchMiddleware(deletepackage))
+  .post("/wishlists/:id",verifyUsertoken,tryCatchMiddleware(Wishlist))
+  .get("/wishlists/:id",verifyUsertoken,tryCatchMiddleware(showwishlist))
+  .delete("/wishlists/:id",verifyUsertoken,tryCatchMiddleware(deletewishlist))
 
 export default PackageRouter;
