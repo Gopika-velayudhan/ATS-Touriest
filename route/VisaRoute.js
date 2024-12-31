@@ -12,6 +12,8 @@ import {
 } from "../controller/VisaController.js";
 import verifyAdmintoken from "../middileware/AdminAuth.js"; 
 import VerifyUserToken from "../middileware/UserAuth.js"; 
+import { multipleImageUpload, singleImageUpload } from "../middileware/imageUpload.js";
+
 
 const VisaRouter = express.Router();
 

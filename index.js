@@ -12,6 +12,7 @@ import passport from "./utility/PassportConfig.js";
 import session from "express-session";
 import googleRouter from "./route/googleroute.js";
 import VisaRouter from "./route/VisaRoute.js";
+import Cartrouter from "./route/cartRoutes.js";
 
 dotenv.config();
 
@@ -36,6 +37,7 @@ app.use(
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+
 app.use(
   session({
     secret: process.env.USER_ACCESS_TOKEN_SECRET,
@@ -47,7 +49,7 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-
+app.use("/api",Cartrouter)
 app.use("/api", Activerouter);
 app.use("/api",googleRouter)
 app.use('/api/admin',AdminRoute)
@@ -55,6 +57,7 @@ app.use("/api/auth", Userrouter);
 app.use("/api", PackageRouter);
 app.use("/api",VisaRouter)
 app.use("/api",ReviewRouter)
+
 
 
 

@@ -32,7 +32,7 @@ cloudinary.config({
 const uploadToCloudinary = async (filePath, retries = 3) => {
   try {
     const result = await cloudinary.uploader.upload(filePath, {
-      folder: "clone-imgs",
+      folder: "touriest-imgs",
     });
     return result;
   } catch (error) {
@@ -44,8 +44,10 @@ const uploadToCloudinary = async (filePath, retries = 3) => {
 
 // Middleware to handle multiple image upload
 const multipleImageUpload = (req, res, next) => {
+  console.log("Headers:", req.headers); // Log headers to check for Content-Type issues
   upload.array("images", 10)(req, res, async (err) => {
     if (err) {
+      console.error("Multer error:", err);
       return res.status(400).json({
         error: err.message,
       });
@@ -86,6 +88,7 @@ const multipleImageUpload = (req, res, next) => {
 const singleImageUpload = (req, res, next) => {
   upload.single("image")(req, res, async (err) => {
     if (err) {
+      console.error("Multer error:", err);
       return res.status(400).json({
         error: err.message,
       });
@@ -94,14 +97,13 @@ const singleImageUpload = (req, res, next) => {
     try {
       const file = req.file;
 
-      
       const result = await uploadToCloudinary(file.path);
 
       if (!result || !result.secure_url) {
         throw new Error("Upload to Cloudinary failed");
       }
 
-      
+      // Remove the local file after uploading to Cloudinary
       fs.unlink(file.path, (unlinkerError) => {
         if (unlinkerError) {
           console.log("Error deleting local file", unlinkerError);

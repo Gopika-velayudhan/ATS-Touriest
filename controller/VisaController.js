@@ -150,59 +150,60 @@ export const deleteVisa = async (req, res) => {
 
 // Search Visas
 export const searchVisas = async (req, res) => {
-    try {
-      const { visaType, country, nationality, travelerNumber, minFee, maxFee } = req.query;
-  
-      const query = {};
-  
-      
-      if (country) {
-        query.country = { $regex: country, $options: "i" }; 
-      }
-  
-      
-      if (visaType) {
-        query.visaType = { $regex: visaType, $options: "i" }; 
-      }
-  
-    
-      if (nationality) {
-        query.nationality = { $regex: nationality, $options: "i" };
-      }
-  
-      
-      if (travelerNumber) {
-        query.travelerNumber = { $gte: Number(travelerNumber) }; 
-      }
-  
-      
-      if (minFee || maxFee) {
-        query.pricePerPerson = {};
-        if (minFee) query.pricePerPerson.$gte = Number(minFee);
-        if (maxFee) query.pricePerPerson.$lte = Number(maxFee);
-      }
-  
-      const visas = await Visa.find(query);
-  
-      if (visas.length === 0) {
-        return res.status(404).json({
-          statusCode: 404,
-          message: "No visas found matching your criteria",
-          data: null,
-        });
-      }
-  
-      res.status(200).json({
-        statusCode: 200,
-        message: "Successfully fetched visas",
-        data: visas,
-      });
-    } catch (err) {
-      return res
-        .status(500)
-        .json({ statusCode: 500, message: "Internal server error", data: null });
+  try {
+    const { country, nationality, living, travelDate } = req.query;
+
+    const query = {};
+
+
+    if (country) {
+      query.country = { $regex: country, $options: "i" };
     }
-  };
+
+    
+    if (nationality) {
+      query.nationality = { $regex: nationality, $options: "i" };
+    }
+
+  
+    if (living) {
+      query.living = { $in: living.split(",").map(item => item.trim()) };
+    }
+
+    // Search by travelDate
+    if (travelDate) {
+      const date = new Date(travelDate);
+      if (!isNaN(date.getTime())) {
+        query.travelDate = { $gte: date };
+      }
+    }
+
+    const visas = await Visa.find(query);
+
+    if (visas.length === 0) {
+      return res.status(404).json({
+        statusCode: 404,
+        message: "No visas found matching your criteria",
+        data: null,
+      });
+    }
+
+    res.status(200).json({
+      statusCode: 200,
+      message: "Successfully fetched visas",
+      data: visas,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      statusCode: 500,
+      message: "Internal server error",
+      data: null,
+    });
+  }
+};
+
+
+//submitinquiry
   export const submitInquiry = async (req, res) => {
     try {
       const { name, email, phoneNumber, visaType, country, message } = req.body;

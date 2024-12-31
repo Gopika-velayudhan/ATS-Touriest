@@ -3,12 +3,13 @@ import Joi from "joi";
 export const userValidationSchema = Joi.object({
   name: Joi.string().required(),
 
-  googleId:Joi.string(),
+  googleId: Joi.string(),
 
   email: Joi.string().email().required(),
 
   address: Joi.string().required(),
-  wishlist:Joi.string(),
+  wishlist: Joi.string(),
+  cart : Joi.string(),
 
   password: Joi.string().min(6).required(),
   isVerified: Joi.boolean().optional().default(false),
@@ -63,6 +64,7 @@ export const joiReviewSchema = Joi.object({
   user: Joi.string().required(),
   package: Joi.string().optional(),
   activity: Joi.string().optional(),
+  visa :Joi.string().optional(),
   rating: Joi.number().min(1).max(5).required(),
   reviewText: Joi.string().min(10).required(),
 });
@@ -123,37 +125,46 @@ export const packageBookingValidationSchema = Joi.object({
   additionalServices: Joi.array().items(Joi.string()).optional(),
 });
 
-
-
 export const visaValidationSchema = Joi.object({
   country: Joi.string().required(),
-
+  nationality: Joi.string().required(),
+  living: Joi.array().items(Joi.string()).required(),
+  image: Joi.string().uri().required(), 
+  price: Joi.number().min(0).required(),
+  processingType:Joi.array().items(Joi.string()).required(),
+  
+  travelDate: Joi.date().iso().required(),
   visaType: Joi.string()
-    .valid('Tourist', 'Business', 'Student', 'Work', 'Transit') 
+    .valid("Tourist", "Business", "Student", "Work", "Transit")
     .required(),
-
   visaMode: Joi.string()
-    .valid('E-Visa', 'Visa on Arrival', 'Regular Visa') 
+    .valid("E-Visa", "Visa on Arrival", "Regular Visa")
     .required(),
-
-  validity: Joi.string().required(), 
-
-  maxStay : Joi.string().required(),
-
-  nationality : Joi.string(),
-
-  travelerNumber:Joi.number().min(1),
-
-
-  processingTime: Joi.string().required(), 
-
+  validity: Joi.string().required(),
+  maxStay: Joi.string().required(),
+  processingTime: Joi.string().required(),
   pricePerPerson: Joi.number().min(0).required(),
-
   requirements: Joi.array().items(Joi.string()),
-
   additionalInfo: Joi.string().optional(),
-
-  createdAt: Joi.date().optional(), 
-  updatedAt: Joi.date().optional(), 
+  travelerNumber: Joi.number().min(1),
+  createdAt: Joi.date().optional(),
+  updatedAt: Joi.date().optional(),
+  reviews: Joi.string(),
 });
 
+
+export const cartItemValidationSchema = Joi.object({
+  itemId: Joi.string().required(), 
+  itemType: Joi.string()
+    .valid("Package", "Activity", "Visa")
+    .required(),
+ 
+  price: Joi.number().min(0).required(),
+});
+
+export const cartValidationSchema = Joi.object({
+  userId: Joi.string().required(), 
+  items: Joi.array().items(cartItemValidationSchema).min(1).required(),
+  totalPrice: Joi.number().min(0).required(),
+  updatedAt: Joi.date(),
+});

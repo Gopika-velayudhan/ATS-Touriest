@@ -17,10 +17,9 @@ export const addReview = async (req, res) => {
     });
   }
 
-  const { user, package: packageId, activity, rating, reviewText } = value;
+  const { user, package: packageId, activity, visa, rating, reviewText } = value;
 
   try {
-    
     const existingUser = await User.findById(user);
     if (!existingUser) {
       return res.status(404).json({
@@ -30,9 +29,7 @@ export const addReview = async (req, res) => {
       });
     }
 
-    
     if (packageId) {
-      
       const existingPackage = await Package.findById(packageId);
       if (!existingPackage) {
         return res.status(404).json({
@@ -42,7 +39,6 @@ export const addReview = async (req, res) => {
         });
       }
 
-      
       const userBooking = await PackageBooking.findOne({ userId: user, packageId });
       if (!userBooking) {
         return res.status(403).json({
@@ -52,18 +48,16 @@ export const addReview = async (req, res) => {
         });
       }
 
-      
       const newReview = new Review({
         user,
         package: packageId,
-        activity: undefined, 
+        activity: undefined,
+        visa: undefined,
         rating,
         reviewText,
       });
 
       await newReview.save();
-
-      
       existingPackage.reviews.push(newReview._id);
       await existingPackage.save();
 
@@ -74,7 +68,6 @@ export const addReview = async (req, res) => {
       });
     }
 
-    
     if (activity) {
       const existingActivity = await Activity.findById(activity);
       if (!existingActivity) {
@@ -85,7 +78,6 @@ export const addReview = async (req, res) => {
         });
       }
 
-      
       const userActivityBooking = await PackageBooking.findOne({ userId: user, activityIds: activity });
       if (!userActivityBooking) {
         return res.status(403).json({
@@ -95,18 +87,16 @@ export const addReview = async (req, res) => {
         });
       }
 
-    
       const newReview = new Review({
         user,
         package: undefined,
         activity,
+        visa: undefined,
         rating,
         reviewText,
       });
 
       await newReview.save();
-
-      
       existingActivity.reviews.push(newReview._id);
       await existingActivity.save();
 
@@ -117,13 +107,41 @@ export const addReview = async (req, res) => {
       });
     }
 
-  
+    if (visa) {
+      const existingVisa = await Visa.findById(visa);
+      if (!existingVisa) {
+        return res.status(404).json({
+          statusCode: 404,
+          message: "Visa not found",
+          data: null,
+        });
+      }
+
+      const newReview = new Review({
+        user,
+        package: undefined,
+        activity: undefined,
+        visa,
+        rating,
+        reviewText,
+      });
+
+      await newReview.save();
+      existingVisa.reviews.push(newReview._id);
+      await existingVisa.save();
+
+      return res.status(201).json({
+        statusCode: 201,
+        message: "Review added successfully for the visa",
+        data: newReview,
+      });
+    }
+
     return res.status(400).json({
       statusCode: 400,
-      message: "You must provide either a package or an activity to review",
+      message: "You must provide a package, activity, or visa to review",
       data: null,
     });
-
   } catch (error) {
     console.error("Error adding review:", error);
     return res.status(500).json({
@@ -133,7 +151,6 @@ export const addReview = async (req, res) => {
     });
   }
 };
-
   
 
 export const getActivityReviews = async (req, res) => {
@@ -315,4 +332,45 @@ export const updateReview = async (req, res, next) => {
       .status(500)
       .json({ statusCode: 500, message: "Internal server error", data: null });
   }
+
+
 };
+
+export const getVisaReviews = async (req, res) => {
+  const { visaId } = req.params;
+
+  try {
+    const reviewCount = await Review.countDocuments({ visa: visaId });
+    const reviewDocs = await Review.find({ visa: visaId }).populate("user", "name image email");
+
+    if (!reviewDocs || reviewDocs.length === 0) {
+      return res.status(200).json({
+        statusCode: 200,
+        message: "No reviews for this visa",
+        data: [],
+        dataCount: reviewCount,
+        overallRating: 0,
+      });
+    }
+
+    const totalRating = reviewDocs.reduce((acc, review) => acc + review.rating, 0);
+    const overallRating = totalRating / reviewCount;
+
+    await Visa.findByIdAndUpdate(visaId, { overallRating });
+
+    return res.status(200).json({
+      statusCode: 200,
+      message: "Fetched reviews of this visa",
+      data: reviewDocs,
+      dataCount: reviewCount,
+      overallRating: overallRating.toFixed(1),
+    });
+  } catch (error) {
+    return res.status(500).json({
+      statusCode: 500,
+      message: "Internal server error",
+      data: null,
+    });
+  }
+};
+
