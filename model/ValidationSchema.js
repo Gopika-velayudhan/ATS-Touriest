@@ -126,24 +126,24 @@ export const packageBookingValidationSchema = Joi.object({
 });
 
 export const visaValidationSchema = Joi.object({
-  country: Joi.string().required(),
-  nationality: Joi.string().required(),
-  living: Joi.array().items(Joi.string()).required(),
-  image: Joi.string().uri().required(), 
-  price: Joi.number().min(0).required(),
-  processingType:Joi.array().items(Joi.string()).required(),
+  country: Joi.string(),
+  nationality: Joi.string(),
+  living: Joi.array().items(Joi.string()),
+  image: Joi.string().uri(), 
+  price: Joi.number().min(0),
+  processingType:Joi.array().items(Joi.string()),
   
-  travelDate: Joi.date().iso().required(),
+  travelDate: Joi.date().iso(),
   visaType: Joi.string()
     .valid("Tourist", "Business", "Student", "Work", "Transit")
-    .required(),
+    ,
   visaMode: Joi.string()
     .valid("E-Visa", "Visa on Arrival", "Regular Visa")
-    .required(),
-  validity: Joi.string().required(),
-  maxStay: Joi.string().required(),
-  processingTime: Joi.string().required(),
-  pricePerPerson: Joi.number().min(0).required(),
+    ,
+  validity: Joi.string(),
+  maxStay: Joi.string(),
+  processingTime: Joi.string(),
+  pricePerPerson: Joi.number().min(0),
   requirements: Joi.array().items(Joi.string()),
   additionalInfo: Joi.string().optional(),
   travelerNumber: Joi.number().min(1),

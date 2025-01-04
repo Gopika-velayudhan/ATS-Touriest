@@ -4,11 +4,11 @@ const VisaSchema = new mongoose.Schema(
   {
     country: {
       type: String,
-      required: true,
+    
     },
     nationality: {
       type: String,
-      required: true,
+      
     },
 
     living: {
@@ -18,48 +18,48 @@ const VisaSchema = new mongoose.Schema(
     },
     image: {
       type: String,
-      required: true,
+      
     },
     price: {
       type: Number,
-      required: true,
+      
       min: 0,
     },
     processingType: {
       type: [String],
 
-      required: true,
+      
     },
     travelDate: {
       type: Date,
-      required: true,
+      
     },
     visaType: {
       type: String,
-      required: true,
+    
       enum: ["Tourist", "Business", "Student", "Work", "Transit"],
     },
     visaMode: {
       type: String,
-      required: true,
+      
       enum: ["E-Visa", "Visa on Arrival", "Regular Visa"],
     },
     validity: {
       type: String,
-      required: true,
+      
     },
     processingTime: {
       type: String,
-      required: true,
+    
     },
     pricePerPerson: {
       type: Number,
-      required: true,
+    
       min: 0,
     },
     maxStay: {
       type: String,
-      required: true,
+      
     },
     requirements: [
       {

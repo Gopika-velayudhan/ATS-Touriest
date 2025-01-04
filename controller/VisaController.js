@@ -9,6 +9,8 @@ dotenv.config();
 // Create a new Visa
 export const createVisa = async (req, res) => {
   const { value, error } = visaValidationSchema.validate(req.body);
+  
+  
 
   if (error) {
     return res.status(400).json({
@@ -22,7 +24,7 @@ export const createVisa = async (req, res) => {
   try {
     const newVisa = await Visa.create(value);
 
-    res.status(201).json({
+   return res.status(201).json({
       statusCode: 201,
       message: "Visa created successfully",
       data: newVisa,

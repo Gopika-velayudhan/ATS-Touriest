@@ -24,20 +24,20 @@ export const addItemToCart = async (req, res) => {
     if (!cart) {
       
       cart = await Cart.create({ userId, items, totalPrice });
-      // Link the cart with the user
+      
       user.cart = cart._id;
       await user.save();
       return res.status(201).json({ statusCode: 201, message: "Cart created successfully", data: cart });
     }
 
-    // Update the existing cart
+    
     items.forEach((newItem) => {
       const existingItemIndex = cart.items.findIndex(
         (item) => item.itemId.toString() === newItem.itemId && item.itemType === newItem.itemType
       );
 
       if (existingItemIndex >= 0) {
-        // Update quantity and price of existing item
+
         
         cart.items[existingItemIndex].price = newItem.price; // Update price if changed
       } else {

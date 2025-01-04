@@ -48,14 +48,14 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
-
+app.use("/api",VisaRouter)
 app.use("/api",Cartrouter)
 app.use("/api", Activerouter);
 app.use("/api",googleRouter)
 app.use('/api/admin',AdminRoute)
 app.use("/api/auth", Userrouter);
 app.use("/api", PackageRouter);
-app.use("/api",VisaRouter)
+
 app.use("/api",ReviewRouter)
 
 
