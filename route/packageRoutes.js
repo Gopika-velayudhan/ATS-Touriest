@@ -20,7 +20,7 @@ const PackageRouter = express.Router();
 
 PackageRouter.post(
   "/packages",
-  multipleImageUpload,
+  // multipleImageUpload,
   verifyAdmintoken,
   tryCatchMiddleware(createPackacge)
 )

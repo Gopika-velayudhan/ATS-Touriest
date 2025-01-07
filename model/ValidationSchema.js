@@ -29,37 +29,77 @@ export const userValidationSchema = Joi.object({
 
 export const packageValidationSchema = Joi.object({
   name: Joi.string().trim().required(),
-
   description: Joi.string().trim().required(),
-
-  price: Joi.number().min(0).required(),
-
-  destination: Joi.string().trim().required(),
-
-  startDate: Joi.date().required(),
-
-  endDate: Joi.date().greater(Joi.ref("startDate")).required(),
-
-  images: Joi.array().items(Joi.string().uri()),
-  includedActivities: Joi.array().items(Joi.string().hex()),
-  includedHotels: Joi.array().items(Joi.string().hex()),
-
-  availableSeats: Joi.number().min(0).required(),
-  review: Joi.string(),
-});
-
-export const activityValidationSchema = Joi.object({
-  name: Joi.string().trim().required(),
-
-  description: Joi.string().trim().required(),
-  duration: Joi.string().trim().required(),
+  duration: Joi.number().required(),
+  durationType: Joi.string().valid('hours', 'days').required(),
   price: Joi.number().min(0).required(),
   images: Joi.array().items(Joi.string().uri()),
-
   date: Joi.date().required(),
-  reviews: Joi.string(),
+  includedActivities: Joi.array().items(Joi.string().regex(/^[0-9a-fA-F]{24}$/)), 
+  country: Joi.string().trim().required(),
+  city: Joi.string().trim().required(),
+  customerType: Joi.string().valid('general', 'vip', 'exclusive').required(),
+  highlights: Joi.array().items(Joi.string()).required(),
+  included: Joi.array().items(Joi.string()).required(),
+  excluded: Joi.array().items(Joi.string()).required(),
+  faqs: Joi.array().items(
+    Joi.object({
+      question: Joi.string().required(),
+      answer: Joi.string().required(),
+    })
+  ),
+  goodToKnow: Joi.array().items(
+    Joi.object({
+      label: Joi.string().required(),
+      answer: Joi.string().required(),
+    })
+  ),
+  itinerary: Joi.array().items(
+    Joi.object({
+      label: Joi.string().required(),
+      heading: Joi.string().required(),
+      answer: Joi.string().required(),
+    })
+  ),
+  availableSeats: Joi.number().min(0),
+  reviews: Joi.array().items(Joi.string().regex(/^[0-9a-fA-F]{24}$/)), 
+  overallRating: Joi.number().min(0).max(5), 
+});
+const PricingSchema = Joi.object({
+  adult: Joi.number().required().min(0),
+  child: Joi.number().required().min(0),
+  infant: Joi.number().required().min(0),
 });
 
+// Joi Schema for Extra Services
+const ExtraServiceSchema = Joi.object({
+  extraServiceName: Joi.string().required(),
+  pricing: PricingSchema.required(),
+});
+
+// Joi Schema for Variations
+const VariationSchema = Joi.object({
+  variationName: Joi.string().required(),
+  extraService: Joi.array().items(ExtraServiceSchema).required(),
+});
+
+// Joi Schema for Location
+const LocationSchema = Joi.object({
+  country: Joi.string().required(),
+  state: Joi.string().required(),
+  city: Joi.string().required(),
+});
+
+// Joi Schema for Activity
+export const activityValidationSchema = Joi.object({
+  name: Joi.string().required(),
+  category: Joi.string().required(),
+  variations: Joi.array().items(VariationSchema).required(),
+  images: Joi.array().items(Joi.string().uri()).required(),
+  location: LocationSchema.required(),
+  reviews: Joi.array().items(Joi.string().regex(/^[0-9a-fA-F]{24}$/)), 
+  overallRating: Joi.number().min(0).max(5).default(0),
+});
 export const joiReviewSchema = Joi.object({
   user: Joi.string().required(),
   package: Joi.string().optional(),

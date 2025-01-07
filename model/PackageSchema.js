@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
-import Activity from './ActivitySchema.js'
-
+import Activity from './ActivitySchema.js';
 
 const PackageSchema = new mongoose.Schema(
   {
@@ -14,44 +13,114 @@ const PackageSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    duration: {
+      type: Number,
+      required: true,
+    },
+    durationType: {
+      type: String,
+      enum: ['hours', 'days'],
+      required: true,
+    },
     price: {
       type: Number,
       required: true,
       min: 0,
     },
-    destination: {
+    images: [
+      {
+        type: String,
+      },
+    ],
+    date: {
+      type: Date,
+      required: true,
+    },
+
+    includedActivities: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: 'Activity', 
+        
+      },
+    ],
+    country: {
       type: String,
       required: true,
       trim: true,
     },
-    startDate: {
-      type: Date,
+    city: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    customerType: {
+      type: String,
+      enum: ['general', 'vip', 'exclusive'],
       required: true,
     },
-    endDate: {
-      type: Date,
-      required: true,
-    },
-    images: [{
-        type: String
-    }],
-    includedActivities: [
-        {
-          type: mongoose.Types.ObjectId,
-          ref: 'Activity', 
-          
+    highlights: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
+    included: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
+    excluded: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
+    faqs: [
+      {
+        question: {
+          type: String,
+          required: true,
         },
-      ],
-
-      
+        answer: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
+    goodToKnow: [
+      {
+        label: {
+          type: String,
+          required: true,
+        },
+        answer: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
+    itinerary: [
+      {
+        label: {
+          type: String,
+          required: true,
+        },
+        heading: {
+          type: String,
+          required: true,
+        },
+        answer: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
     availableSeats: {
       type: Number,
-      required: true,
+      
       min: 0,
-    },
-    createdAt: {
-      type: Date,
-      default: Date.now,
     },
 
     reviews: [{ type: mongoose.Schema.ObjectId, ref: "Review" }],
@@ -59,13 +128,15 @@ const PackageSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
-  
   {
     timestamps: true, 
   }
 );
-
 
 const Package = mongoose.model('Package', PackageSchema);
 
