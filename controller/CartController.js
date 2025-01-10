@@ -132,3 +132,94 @@ export const getAllCarts = async (req, res) => {
     res.status(500).json({ statusCode: 500, message: err.message, data: null });
   }
 };
+//checkout
+export const checkout = async (req, res) => {
+  try {
+    const { cartId, paymentMethod } = req.body;
+
+    if (!cartId) {
+      return res.status(400).json({
+        statusCode: 400,
+        message: "Cart ID is required",
+        data: null,
+      });
+    }
+
+    
+    const cart = await Cart.findById(cartId).populate("items.itemId");
+    if (!cart) {
+      return res.status(404).json({
+        statusCode: 404,
+        message: "Cart not found",
+        data: null,
+      });
+    }
+
+    if (cart.items.length === 0) {
+      return res.status(400).json({
+        statusCode: 400,
+        message: "Cart is empty",
+        data: null,
+      });
+    }
+
+    
+    cart.totalPrice = cart.items.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
+
+    const paymentSuccess = await processPayment(cart.totalPrice, paymentMethod);
+
+    if (!paymentSuccess) {
+      return res.status(400).json({
+        statusCode: 400,
+        message: "Payment failed",
+        data: null,
+      });
+    }
+
+    
+    for (const item of cart.items) {
+      const itemModel = mongoose.model(item.itemType);
+      const purchasedItem = await itemModel.findById(item.itemId);
+
+      if (purchasedItem && purchasedItem.stock) {
+        if (purchasedItem.stock < item.quantity) {
+          return res.status(400).json({
+            statusCode: 400,
+            message: `Insufficient stock for item ${purchasedItem.name}`,
+            data: null,
+          });
+        }
+
+        purchasedItem.stock -= item.quantity;
+        await purchasedItem.save();
+      }
+    }
+
+    
+    cart.items = [];
+    cart.totalPrice = 0;
+    cart.updatedAt = new Date();
+    await cart.save();
+
+    
+    res.status(200).json({
+      statusCode: 200,
+      message: "Checkout successful",
+      data: {
+        cartId: cart._id,
+        paymentMethod,
+        checkoutDate: new Date(),
+      },
+    });
+  } catch (err) {
+    console.error("Error during checkout:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Internal server error",
+      data: null,
+    });
+  }
+};

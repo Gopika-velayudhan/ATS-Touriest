@@ -2,8 +2,9 @@ import PackageBooking from "../model/BookingSchema.js";
 import { packageBookingValidationSchema } from "../model/ValidationSchema.js";
 import Package from "../model/PackageSchema.js";
 import User from "../model/AuthSchema.js";
+import { sendBookingConfirmationEmail } from "../utility/BookingMail.js";
 
-import crypto from "crypto"; 
+import crypto from "crypto";
 
 export const createBooking = async (req, res) => {
   const { value, error } = packageBookingValidationSchema.validate(req.body);
@@ -17,7 +18,6 @@ export const createBooking = async (req, res) => {
   }
 
   try {
-    
     const packageExists = await Package.findById(value.packageId);
     if (!packageExists) {
       return res.status(404).json({
@@ -27,7 +27,6 @@ export const createBooking = async (req, res) => {
       });
     }
 
-    
     if (new Date(value.checkOutTime) <= new Date(value.checkInTime)) {
       return res.status(400).json({
         statusCode: 400,
@@ -36,20 +35,39 @@ export const createBooking = async (req, res) => {
       });
     }
 
-    
     const currentDate = new Date();
-    const formattedDate = currentDate.toISOString().slice(0, 10).replace(/-/g, ""); 
+    const formattedDate = currentDate
+      .toISOString()
+      .slice(0, 10)
+      .replace(/-/g, "");
     const randomString = crypto.randomBytes(3).toString("hex").toUpperCase();
     const bookingReferenceId = `PKG-${formattedDate}-${randomString}`;
 
-    
     const newBooking = new PackageBooking({
       ...value,
       userId: req.user.userId,
-      bookingReferenceId
+      bookingReferenceId,
     });
 
     const savedBooking = await newBooking.save();
+
+    // Fetch user details for email
+    const user = await User.findById(req.user.userId);
+    if (user) {
+      const bookingDetails = {
+        packageName: packageExists.name,
+        checkInTime: savedBooking.checkInTime,
+        checkOutTime: savedBooking.checkOutTime,
+        totalPrice: savedBooking.totalPrice,
+      };
+
+      // Send booking confirmation email
+      await sendBookingConfirmationEmail(
+        user.email,
+        bookingReferenceId,
+        bookingDetails
+      );
+    }
 
     return res.status(201).json({
       statusCode: 201,
@@ -67,7 +85,6 @@ export const createBooking = async (req, res) => {
     });
   }
 };
-
 
 export const getBookingHistory = async (req, res) => {
   const { userId } = req.user;
@@ -138,7 +155,10 @@ export const getAllBookingDetails = async (req, res) => {
 
 export const getTotalTransactionStats = async (req, res) => {
   try {
-    const bookings = await PackageBooking.find({ paymentStatus: "completed" }, "totalPrice").exec();
+    const bookings = await PackageBooking.find(
+      { paymentStatus: "completed" },
+      "totalPrice"
+    ).exec();
 
     if (!bookings.length) {
       return res.status(404).json({

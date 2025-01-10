@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import transporter from "./Nodemailer.js"
+import transporter from "./Nodemailer.js";
 
 export const sendOTP = async (email) => {
   const otp = crypto.randomInt(100000, 999999).toString();
@@ -12,7 +12,6 @@ export const sendOTP = async (email) => {
     html: `<b>Your OTP code is ${otp}</b>`,
   };
 
-  
   await transporter.sendMail(mailOptions);
 
   return otp;

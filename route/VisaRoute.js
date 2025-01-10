@@ -23,6 +23,7 @@ VisaRouter.get("/visas", tryCatchMiddleware(getAllVisas))
   .get("/visas/:id", VerifyUserToken, tryCatchMiddleware(getVisaById))
   .post("/Inquiry", VerifyUserToken, tryCatchMiddleware(submitInquiry))
   .put("/visas/:id", verifyAdmintoken, tryCatchMiddleware(updateVisa))
+
   .delete("/visas/:id", verifyAdmintoken, tryCatchMiddleware(deleteVisa));
 
-export default VisaRouter
+export default VisaRouter;

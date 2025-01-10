@@ -153,18 +153,27 @@ export const deletepackage = async (req, res) => {
 };
 
 export const searchPackages = async (req, res) => {
-  const { country, date, budget, membersCount } = req.query;
+  const { country, city, date, budget, membersCount } = req.query;
+
 
   const dateRange = date ? date.split(",") : [];
   const budgetRange = budget ? budget.split(",") : [];
   const membersRange = membersCount ? membersCount.split(",") : [];
 
   try {
+    
     let query = {};
 
+  
     if (country) {
-      query.destination = country;
+      query.country = country.trim();
     }
+
+    
+    if (city) {
+      query.city = city.trim();
+    }
+
 
     if (dateRange.length === 2) {
       const startDate = new Date(dateRange[0]);
@@ -178,16 +187,15 @@ export const searchPackages = async (req, res) => {
         });
       }
 
-      query.startDate = { $gte: startDate };
-      query.endDate = { $lte: endDate };
+      query.date = { $gte: startDate, $lte: endDate };
     }
 
+  
     if (budgetRange.length === 2) {
       const minBudget = Number(budgetRange[0]);
       const maxBudget = Number(budgetRange[1]);
 
       if (isNaN(minBudget) || isNaN(maxBudget)) {
-        console.log("Invalid budget range:", { minBudget, maxBudget });
         return res.status(400).json({
           statusCode: 400,
           message: "Invalid budget range format",
@@ -198,12 +206,12 @@ export const searchPackages = async (req, res) => {
       query.price = { $gte: minBudget, $lte: maxBudget };
     }
 
+    
     if (membersRange.length === 2) {
       const minMembers = Number(membersRange[0]);
       const maxMembers = Number(membersRange[1]);
 
       if (isNaN(minMembers) || isNaN(maxMembers)) {
-        console.log("Invalid members count range:", { minMembers, maxMembers });
         return res.status(400).json({
           statusCode: 400,
           message: "Invalid members count range format",
@@ -214,6 +222,7 @@ export const searchPackages = async (req, res) => {
       query.availableSeats = { $gte: minMembers, $lte: maxMembers };
     }
 
+  
     const packages = await Package.find(query);
 
     if (packages.length === 0) {
@@ -224,19 +233,23 @@ export const searchPackages = async (req, res) => {
       });
     }
 
+    
     return res.status(200).json({
       statusCode: 200,
       message: "Successfully fetched packages",
       data: packages,
     });
   } catch (err) {
+  
     return res.status(500).json({
-      statusCode: 400,
-      message: err.message,
+      statusCode: 500,
+      message: "An error occurred while fetching packages",
+      error: err.message,
       data: null,
     });
   }
 };
+
 
 export const Wishlist = async (req, res) => {
   const userid = req.params.id;

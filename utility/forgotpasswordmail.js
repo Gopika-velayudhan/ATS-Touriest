@@ -1,4 +1,4 @@
-import transporter from './Nodemailer.js';
+import transporter from "./Nodemailer.js";
 import dotenv from "dotenv";
 dotenv.config();
 
